@@ -25,6 +25,8 @@ import (
 )
 
 var (
+	// The regexp test if the path contains globs * and/or ?
+	reGlob = regexp.MustCompile(`[\*\?]`)
 	// The regexp is for matching include file directive
 	reIncludeFile = regexp.MustCompile(`^#include\s+(.+?)\s*$`)
 	// The regexp is for matching require file directive
@@ -69,19 +71,32 @@ func (list *fileList) pushFile(path string, required bool) error {
 		absPath = path
 	}
 
-	// Test the file with the absolute path exists in the list
-	for _, file := range *list {
-		if file.Path == absPath {
-			return nil
+	// Make the list of file candidates to include
+	var candidates []string
+	if reGlob.MatchString(absPath) {
+		candidates, err = filepath.Glob(absPath)
+		if err != nil {
+			return err
 		}
+	} else {
+		candidates = []string{absPath}
 	}
 
-	// Push the new file to the list
-	*list = append(*list, &configFile{
-		Path:     absPath,
-		Required: required,
-		Read:     false,
-	})
+	for _, candidate := range candidates {
+		// Test the file with the absolute path exists in the list
+		for _, file := range *list {
+			if file.Path == candidate {
+				return nil
+			}
+		}
+
+		// Push the new file to the list
+		*list = append(*list, &configFile{
+			Path:     candidate,
+			Required: required,
+			Read:     false,
+		})
+	}
 
 	return nil
 }

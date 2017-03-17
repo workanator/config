@@ -16,6 +16,8 @@
 
 + Support for #include and #require directives.
 
++ #include and #require supports globs.
+
 ### 2011-??-??  v0.9.6
 
 + Changed to line comments.

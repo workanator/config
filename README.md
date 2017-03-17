@@ -101,7 +101,8 @@ directives tells the loader which file to load and how.
 exist loading of the configuration will fail.
 
 Here `<path>` is the relative or absolute path to the file which should be
-loaded, e.g. `#require db.cfg`, `#include /etc/my_tool/extra.cfg`.
+loaded, e.g. `#require db.cfg`, `#include /etc/my_tool/extra.cfg`. The path
+can contain globs (or wildcards), e.g. `#include user/*.cfg`.
 
 Please notice that all relative paths are relative to the main file path,
 this path you passed into `config.Read()` or `config.ReadDefault()`.
