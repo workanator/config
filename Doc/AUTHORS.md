@@ -12,8 +12,8 @@ explanation.*
 
 * * *
 
+[Andrew Bashkatov](https://github.com/workanator)
 [Jonas mg](https://github.com/kless)
 [Miguel Branco](https://github.com/msbranco)
 [Rob Figueiredo](https://github.com/robfig)
 [Tom Bruggeman](https://github.com/tmbrggmn)
-

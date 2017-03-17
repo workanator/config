@@ -23,6 +23,6 @@ because the organization holds the copyright.*
 
 ### Other authors
 
+[Andrew Bashkatov](https://github.com/workanator)
 [Jonas mg](https://github.com/kless)
 [Tom Bruggeman](https://github.com/tmbrggmn)
-

@@ -81,10 +81,34 @@ This results in the file:
 
 Note that sections, options and values are all case-sensitive.
 
+## Configuration loader directives
+
+The loader which is responsible for loading configuration files supports
+some directives which can be handy in some situations, .e.g in case
+multi-file configuration is used.
+
+Directives are started with hash `#` and followed with the name of the
+directive and zero, one or many arguments. For example,
+`#include extra/user.cfg`.
+
+### Including files
+
+The loader can be instructed to load other configuration file(s). Those
+directives tells the loader which file to load and how.
+
+* `#include <path>` instructs the loader to load the file if it's found.
+* `#require <path>` instructs the loader to load the file and if it does not
+exist loading of the configuration will fail.
+
+Here `<path>` is the relative or absolute path to the file which should be
+loaded, e.g. `#require db.cfg`, `#include /etc/my_tool/extra.cfg`.
+
+Please notice that all relative paths are relative to the main file path,
+this path you passed into `config.Read()` or `config.ReadDefault()`.
+
 ## License
 
 The source files are distributed under the [Mozilla Public License, version 2.0](http://mozilla.org/MPL/2.0/),
 unless otherwise noted.  
 Please read the [FAQ](http://www.mozilla.org/MPL/2.0/FAQ.html)
 if you have further questions regarding the license.
-

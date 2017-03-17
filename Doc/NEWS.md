@@ -12,6 +12,10 @@
 
 * * *
 
+### 2017-03-17  v0.10.0
+
++ Support for #include and #require directives.
+
 ### 2011-??-??  v0.9.6
 
 + Changed to line comments.
@@ -49,4 +53,3 @@ comment and separator, and the spaces around separator.
 after of each new line.
 
 + Better documentation.
-
