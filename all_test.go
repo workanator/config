@@ -23,9 +23,12 @@ import (
 )
 
 const (
-	tmpFilename    = "testdata/__test.go"
-	sourceFilename = "testdata/source.cfg"
-	targetFilename = "testdata/target.cfg"
+	tmpFilename              = "testdata/__test.go"
+	sourceFilename           = "testdata/source.cfg"
+	targetFilename           = "testdata/target.cfg"
+	failedRequireFilename    = "testdata/failed_require.cfg"
+	failedAbsRequireFilename = "testdata/failed_abs_require.cfg"
+	failedIncludeFilename    = "testdata/failed_include.cfg"
 )
 
 func testGet(t *testing.T, c *Config, section string, option string,
@@ -364,12 +367,12 @@ func TestSectionOptions(t *testing.T) {
 func TestMerge(t *testing.T) {
 	target, error := ReadDefault(targetFilename)
 	if error != nil {
-		t.Fatalf("Unable to read target config file '%s'", targetFilename)
+		t.Fatalf("Unable to read target config file '%s' because %s", targetFilename, error)
 	}
 
 	source, error := ReadDefault(sourceFilename)
 	if error != nil {
-		t.Fatalf("Unable to read source config file '%s'", sourceFilename)
+		t.Fatalf("Unable to read source config file '%s' because %s", sourceFilename, error)
 	}
 
 	target.Merge(source)
@@ -396,5 +399,34 @@ func TestMerge(t *testing.T) {
 	}
 	if result, _ := target.String("X", "x.four"); result != "x4" {
 		t.Errorf("Expected '[X] x.four' to be 'x4' but instead it was '%s'", result)
+	}
+}
+
+// TestFailedRequirement tests loading file with invalid #require
+func TestFailedRequirement(t *testing.T) {
+	_, error := ReadDefault(failedRequireFilename)
+	if error != nil {
+		t.Logf("Unable to read config file '%s' because %s", failedRequireFilename, error)
+	} else {
+		t.Errorf("Load of config file '%s' must fail", failedRequireFilename)
+	}
+}
+
+// TestFailedInclude tests loading file with invalid #include
+func TestFailedInclude(t *testing.T) {
+	_, error := ReadDefault(failedIncludeFilename)
+	if error != nil {
+		t.Errorf("Unable to read config file '%s' because %s", failedIncludeFilename, error)
+	}
+}
+
+// TestFailedAbsRequirement tests loading file with invalid #require with
+// absolute path
+func TestFailedAbsRequirement(t *testing.T) {
+	_, error := Read(failedAbsRequireFilename, DEFAULT_COMMENT, DEFAULT_SEPARATOR, false, false)
+	if error != nil {
+		t.Logf("Unable to read config file '%s' because %s", failedAbsRequireFilename, error)
+	} else {
+		t.Errorf("Load of config file '%s' must fail", failedAbsRequireFilename)
 	}
 }
