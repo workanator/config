@@ -93,19 +93,18 @@ directive and zero, one or many arguments. For example,
 
 ### Including files
 
-The loader can be instructed to load other configuration file(s). Those
-directives tells the loader which file to load and how.
+The loader can be instructed to load other configuration file(s) with
+directive `#include`. The directive requires loading files to exist what
+means if the loader fails loading one of including files it will fail
+loading the whole configuration.
 
-* `#include <path>` instructs the loader to load the file if it's found.
-* `#require <path>` instructs the loader to load the file and if it does not
-exist loading of the configuration will fail.
-
-Here `<path>` is the relative or absolute path to the file which should be
-loaded, e.g. `#require db.cfg`, `#include /etc/my_tool/extra.cfg`. The path
+The syntax of the directive is `#include <path>` where `<path>` is the relative
+or absolute path to the file which should be loaded,
+e.g. `#include db.cfg`, `#include /etc/my_tool/extra.cfg`. The path
 can contain globs (or wildcards), e.g. `#include user/*.cfg`.
 
 Please notice that all relative paths are relative to the main file path,
-this path you passed into `config.Read()` or `config.ReadDefault()`.
+the path you passed into `config.Read()` or `config.ReadDefault()`.
 
 ## License
 

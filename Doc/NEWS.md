@@ -14,7 +14,7 @@
 
 ### 2017-03-17  v0.10.0
 
-+ Support for #include and #require directives.
++ Support for #include directive.
 
 + #include and #require supports globs.
 

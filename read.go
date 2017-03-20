@@ -29,15 +29,12 @@ var (
 	reGlob = regexp.MustCompile(`[\*\?]`)
 	// The regexp is for matching include file directive
 	reIncludeFile = regexp.MustCompile(`^#include\s+(.+?)\s*$`)
-	// The regexp is for matching require file directive
-	reRequireFile = regexp.MustCompile(`^#require\s+(.+?)\s*$`)
 )
 
 // configFile identifies a file which should be read.
 type configFile struct {
-	Path     string
-	Required bool
-	Read     bool
+	Path string
+	Read bool
 }
 
 // fileList is the list of files to read.
@@ -47,7 +44,7 @@ type fileList []*configFile
 // into the list if it does not contain the same absolute path already.
 // All relative paths are relative to the main file which is the first
 // file in the list.
-func (list *fileList) pushFile(path string, required bool) error {
+func (list *fileList) pushFile(path string) error {
 	var (
 		absPath string
 		err     error
@@ -92,23 +89,12 @@ func (list *fileList) pushFile(path string, required bool) error {
 
 		// Push the new file to the list
 		*list = append(*list, &configFile{
-			Path:     candidate,
-			Required: required,
-			Read:     false,
+			Path: candidate,
+			Read: false,
 		})
 	}
 
 	return nil
-}
-
-// includeFile is the shorthand for pushFile(path, false)
-func (list *fileList) includeFile(path string) error {
-	return list.pushFile(path, false)
-}
-
-// requireFile is the shorthand for pushFile(path, true)
-func (list *fileList) requireFile(path string) error {
-	return list.pushFile(path, true)
 }
 
 // _read reads file list
@@ -120,7 +106,7 @@ func _read(c *Config, list *fileList) (*Config, error) {
 		// Go through the list and read files
 		for _, file := range *list {
 			if !file.Read {
-				if err := _readFile(file.Path, file.Required, c, list); err != nil {
+				if err := _readFile(file.Path, c, list); err != nil {
 					return nil, err
 				}
 
@@ -140,17 +126,10 @@ func _read(c *Config, list *fileList) (*Config, error) {
 
 // _readFile is the base to read a file and get the configuration representation.
 // That representation can be queried with GetString, etc.
-func _readFile(fname string, require bool, c *Config, list *fileList) error {
+func _readFile(fname string, c *Config, list *fileList) error {
 	file, err := os.Open(fname)
 	if err != nil {
-		// Return the error in case the file required so the further loading
-		// will fail and teh error will be reported back.
-		if require {
-			return err
-		}
-
-		// Otherwise, if the file is not required, just skip loading it.
-		return nil
+		return err
 	}
 
 	// Defer closing the file so we can be sure the underlying file handle
@@ -172,7 +151,7 @@ func _readFile(fname string, require bool, c *Config, list *fileList) error {
 // All arguments, except `fname`, are related to `New()`
 func Read(fname string, comment, separator string, preSpace, postSpace bool) (*Config, error) {
 	list := &fileList{}
-	list.requireFile(fname)
+	list.pushFile(fname)
 
 	return _read(New(comment, separator, preSpace, postSpace), list)
 }
@@ -181,7 +160,7 @@ func Read(fname string, comment, separator string, preSpace, postSpace bool) (*C
 // It uses values by default.
 func ReadDefault(fname string) (*Config, error) {
 	list := &fileList{}
-	list.requireFile(fname)
+	list.pushFile(fname)
 
 	return _read(NewDefault(), list)
 }
@@ -204,9 +183,7 @@ func (c *Config) read(buf *bufio.Reader, list *fileList) (err error) {
 		case l[0] == '#':
 			// Test for possible directives
 			if matches := reIncludeFile.FindStringSubmatch(l); matches != nil {
-				list.includeFile(matches[1])
-			} else if matches := reRequireFile.FindStringSubmatch(l); matches != nil {
-				list.requireFile(matches[1])
+				list.pushFile(matches[1])
 			} else {
 				continue
 			}
